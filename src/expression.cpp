@@ -32,8 +32,8 @@ bool expression::split() {
 		switch (state) {
 
 		case states_of_waiting::number_or_left_bracket:
-			if (*std::find(numbers.begin(), numbers.end(), infix_str[i]) || infix_str[i] == special_signes[1]) {
-				if (*std::find(numbers.begin(), numbers.end(), infix_str[i])) {
+			if (*std::find(numbers.begin(), numbers.end()-1, infix_str[i]) || infix_str[i] == special_signes[1]) {
+				if (*std::find(numbers.begin(), numbers.end()-1, infix_str[i])) {
 					state = number_or_operation_or_point_or_right_bracket;
 				}
 				if (i == infix_str.size() - 1) {
@@ -46,7 +46,7 @@ bool expression::split() {
 			break;
 
 		case states_of_waiting::number_or_operation_or_point_or_right_bracket:
-			if (infix_str[i] == special_signes[0] || infix_str[i] == special_signes[2] || *std::find(numbers.begin(), numbers.end(), infix_str[i]) || *std::find(operations.begin(), operations.end(), infix_str[i])) {
+			if (infix_str[i] == special_signes[0] || infix_str[i] == special_signes[2] || *std::find(numbers.begin(), numbers.end()-1, infix_str[i]) || *std::find(operations.begin(), operations.end()-1, infix_str[i])) {
 
 				if (infix_str[i] == special_signes[0]) {
 					state = states_of_waiting::number;
@@ -57,10 +57,10 @@ bool expression::split() {
 						return true;
 					}
 				}
-				else if (*std::find(operations.begin(), operations.end(), infix_str[i])) {
+				else if (*std::find(operations.begin(), operations.end()-1, infix_str[i])) {
 					state = states_of_waiting::number_or_left_bracket;
 				}
-				else if (*std::find(numbers.begin(), operations.end(), infix_str[i])) {
+				else if (*std::find(numbers.begin(), operations.end()-1, infix_str[i])) {
 					if (i == infix_str.size() - 1) {
 						return true;
 					}
@@ -72,7 +72,7 @@ bool expression::split() {
 			}
 
 		case states_of_waiting::number:
-			if (*std::find(numbers.begin(), numbers.end(), infix_str[i])) {
+			if (*std::find(numbers.begin(), numbers.end()-1, infix_str[i])) {
 				state = states_of_waiting::number_or_operation_or_point_or_right_bracket;
 				if (i == infix_str.size() - 1) {
 					return true;
@@ -83,8 +83,18 @@ bool expression::split() {
 			}
 
 		case operation_or_right_bracket:
-			if (*std::find(numbers.begin(), numbers.end(), infix_str[i]) || *std::find(operations.begin(), operations.end(), infix_str[i])) {
-
+			if (infix_str[i] == special_signes[2] || *std::find(operations.begin(), operations.end()-1, infix_str[i])) {
+				if (*std::find(operations.begin(), operations.end()-1, infix_str[i])) {
+					state = states_of_waiting::number_or_left_bracket;
+					if (i == infix_str.size() - 1) {
+						return false;
+					}
+				}
+				else {
+					if (i == infix_str.size() - 1) {
+						return true;
+					}
+				}
 			}
 			else {
 				return false;
@@ -97,7 +107,9 @@ bool expression::split() {
 }
 
 double expression::calculate() {
+	std::cout << (int)split();
 
+	return double();
 }
 
 
