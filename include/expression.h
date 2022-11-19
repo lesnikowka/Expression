@@ -22,13 +22,13 @@ class expression {
 		number_or_left_bracket_or_unary_minus,
 		number_or_operation_or_point_or_right_bracket,
 		number_or_operation_or_right_bracket,
-		operation_or_right_bracket,		
+		operation_or_right_bracket,	
+		success
 	};
-
+	std::string char_to_string(char symbol);
 	bool split();
 	bool check_brackets();
 	bool is_in_vector(std::vector<char>::iterator i1, std::vector<char>::iterator i2, char val);
-	//void refactoring();
 
 public:
 	expression() = default;
