@@ -16,16 +16,19 @@ class expression {
 	std::vector<char> numbers = { '1','2', '3', '4', '5', '6', '7', '8', '9', '0' };
 	std::vector<char> special_signes = { '.', '(', ')', '-'};
 
-	enum states_of_waiting{
+	enum states_of_waiting {
 		number,
 		number_or_left_bracket,
+		number_or_left_bracket_or_unary_minus,
 		number_or_operation_or_point_or_right_bracket,
+		number_or_operation_or_right_bracket,
 		operation_or_right_bracket,		
 	};
 
 	bool split();
 	bool check_brackets();
 	bool is_in_vector(std::vector<char>::iterator i1, std::vector<char>::iterator i2, char val);
+	//void refactoring();
 
 public:
 	expression() = default;
