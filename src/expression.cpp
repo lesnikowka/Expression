@@ -6,6 +6,16 @@ expression::expression(const expression& ex) : infix_str(ex.infix_str), infix(ex
 std::vector<std::string> expression::get_infix() { return infix; }
 std::vector<std::string> expression::get_postfix() { return postfix; }
 
+bool expression::is_in_vector(std::vector<char>::iterator i1, std::vector<char>::iterator i2, char val) {
+	while (i1 != i2) {
+		if (*i1 == val) {
+			return true;
+		}
+		i1++;
+	}
+	return false;
+}
+
 bool expression::check_brackets() {
 	std::stack<char> stack;
 
@@ -23,17 +33,19 @@ bool expression::check_brackets() {
 }
 
 bool expression::split() {
-	states_of_waiting state = states_of_waiting::number;
+	states_of_waiting state = states_of_waiting::number_or_left_bracket;
 	std::vector<std::string> tmp_split;
 
-	if (!check_brackets()) return false;
+	if (!check_brackets()) {
+		return false;
+	}
 
 	for (size_t i = 0; i < infix_str.size(); i++) {
 		switch (state) {
 
 		case states_of_waiting::number_or_left_bracket:
-			if (*std::find(numbers.begin(), numbers.end()-1, infix_str[i]) || infix_str[i] == special_signes[1]) {
-				if (*std::find(numbers.begin(), numbers.end()-1, infix_str[i])) {
+			if (is_in_vector(numbers.begin(), numbers.end(), infix_str[i]) || infix_str[i] == special_signes[1]) {
+				if (is_in_vector(numbers.begin(), numbers.end(), infix_str[i])) {
 					state = number_or_operation_or_point_or_right_bracket;
 				}
 				if (i == infix_str.size() - 1) {
@@ -46,7 +58,7 @@ bool expression::split() {
 			break;
 
 		case states_of_waiting::number_or_operation_or_point_or_right_bracket:
-			if (infix_str[i] == special_signes[0] || infix_str[i] == special_signes[2] || *std::find(numbers.begin(), numbers.end()-1, infix_str[i]) || *std::find(operations.begin(), operations.end()-1, infix_str[i])) {
+			if (infix_str[i] == special_signes[0] || infix_str[i] == special_signes[2] || is_in_vector(numbers.begin(), numbers.end(), infix_str[i]) || is_in_vector(operations.begin(), operations.end(), infix_str[i])) {
 
 				if (infix_str[i] == special_signes[0]) {
 					state = states_of_waiting::number;
@@ -57,10 +69,10 @@ bool expression::split() {
 						return true;
 					}
 				}
-				else if (*std::find(operations.begin(), operations.end()-1, infix_str[i])) {
+				else if (is_in_vector(operations.begin(), operations.end(), infix_str[i])) {
 					state = states_of_waiting::number_or_left_bracket;
 				}
-				else if (*std::find(numbers.begin(), operations.end()-1, infix_str[i])) {
+				else if (is_in_vector(numbers.begin(), operations.end(), infix_str[i])) {
 					if (i == infix_str.size() - 1) {
 						return true;
 					}
@@ -72,7 +84,7 @@ bool expression::split() {
 			}
 
 		case states_of_waiting::number:
-			if (*std::find(numbers.begin(), numbers.end()-1, infix_str[i])) {
+			if (is_in_vector(numbers.begin(), numbers.end(), infix_str[i])) {
 				state = states_of_waiting::number_or_operation_or_point_or_right_bracket;
 				if (i == infix_str.size() - 1) {
 					return true;
@@ -83,8 +95,8 @@ bool expression::split() {
 			}
 
 		case operation_or_right_bracket:
-			if (infix_str[i] == special_signes[2] || *std::find(operations.begin(), operations.end()-1, infix_str[i])) {
-				if (*std::find(operations.begin(), operations.end()-1, infix_str[i])) {
+			if (infix_str[i] == special_signes[2] || is_in_vector(operations.begin(), operations.end(), infix_str[i])) {
+				if (is_in_vector(operations.begin(), operations.end(), infix_str[i])) {
 					state = states_of_waiting::number_or_left_bracket;
 					if (i == infix_str.size() - 1) {
 						return false;
