@@ -11,6 +11,19 @@ int expression::operation_location(char element) {
 	return -1;
 }
 
+double operate(double first, double second, char operation) {
+	switch (operation) {
+	case '+':
+		return first + second;
+	case '-':
+		return first - second;
+	case '*':
+		return first * second;
+	case '/':
+		return first / second;
+	}
+}
+
 std::string expression::get_infix() { 
 	return infix_str; 
 }
@@ -231,6 +244,28 @@ double expression::calculate() {
 		std::cout << i.first;
 	}
 	std::cout <<std:: endl;
+
+	std::stack<double> values;
+
+	double first_op, second_op;
+	for (auto& literal : postfix) {
+		if (literal.second == type_of_literal::operand) {
+			values.push(std::stod(literal.first));
+		}
+		else {
+			second_op = values.top();
+			values.pop();
+			first_op = values.top();
+			values.pop();
+			values.push(operate(first_op, second_op, literal.first[0]));
+		}
+	}
+
+	std::cout << "result: ";
+	if (!values.empty()) {
+		std::cout << values.top() << std::endl;
+	}
+
 
 	return double();
 }
