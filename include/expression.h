@@ -4,9 +4,10 @@
 #include <vector>
 #include <stack>
 #include <iostream>
+#include <map>
 
 class expression {
-	enum states_of_waiting {
+	enum class states_of_waiting {
 		number,
 		number_or_left_bracket,
 		number_or_left_bracket_or_unary_minus,
@@ -15,32 +16,40 @@ class expression {
 		operation_or_right_bracket,
 		success
 	};
-	enum type_of_literal {
+
+	enum class type_of_literal {
 		operand,
 		right_bracket,
 		left_bracket,
 		operation
 	};
 
+	enum class special_signes {
+		point = '.',
+		right_bracket = ')',
+		left_bracket = '(',
+		unary_minus = '-'
+	};
+
 	std::string infix_str;
+	std::string postfix_str;
 	std::vector<std::pair<std::string, type_of_literal>> infix;
 	std::vector<std::pair<std::string, type_of_literal>> postfix;
 
-	std::vector<char> operations = { '+','-','*','/' };
-	std::vector<int> priorities = { 0,0,1,1 };
-	std::vector<char> numbers = { '1','2', '3', '4', '5', '6', '7', '8', '9', '0' };
-	std::vector<char> special_signes = { '.', '(', ')', '-'};
+	const std::vector<char> operations = { '+','-','*','/' };
+	const std::map<char, int> priorities = { {'+',0},{'-',0},{'*',1},{'/',1} };
+	const std::vector<char> numbers = { '1','2', '3', '4', '5', '6', '7', '8', '9', '0' };
 
 
 	bool split();
 	bool check_brackets();
-	bool is_in_vector(std::vector<char>::iterator i1, std::vector<char>::iterator i2, char val);
-	int operation_location(char element);
+	bool is_in_vector(std::vector<char>::const_iterator i1, std::vector<char>::const_iterator i2, char val);
+	double operate(double first, double second, char operation);
 
 	void to_postfix();
 
 public:
-	expression() = default;
+	expression() = delete;
 	expression(std::string str);
 	expression(const expression& ex);
 
