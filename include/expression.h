@@ -21,7 +21,7 @@ class expression {
 		operand,
 		right_bracket,
 		left_bracket,
-		operation
+		operation,
 	};
 
 	enum class special_signes {
