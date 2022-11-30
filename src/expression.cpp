@@ -59,15 +59,14 @@ bool expression::split() {
 		switch (state) {
 
 		case states_of_waiting::number_or_left_bracket_or_unary_minus:
+			unaryMinusIsPreviousLiteral = false;
 			if (is_in_vector(numbers.cbegin(), numbers.cend(), infix_str[i]) || infix_str[i] == (char)special_signes::left_bracket || infix_str[i] == (char)special_signes::unary_minus) {
 				if (is_in_vector(numbers.cbegin(), numbers.cend(), infix_str[i])) {
 					state = states_of_waiting::number_or_operation_or_point_or_right_bracket;
-					unaryMinusIsPreviousLiteral = false;
 				}
 				else if (infix_str[i] == (char)special_signes::left_bracket) {
 					tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(i,1),type_of_literal::left_bracket));
 					start = i + 1;
-					unaryMinusIsPreviousLiteral = false;
 				}
 				else if (infix_str[i] == (char)special_signes::unary_minus) {
 					state = states_of_waiting::number_or_left_bracket;
@@ -76,7 +75,6 @@ bool expression::split() {
 				}
 				if (i == infix_str.size() - 1 && infix_str[i] != (char)special_signes::unary_minus) {
 					state = states_of_waiting::success;
-					unaryMinusIsPreviousLiteral = false;
 				}
 			}
 			else {
