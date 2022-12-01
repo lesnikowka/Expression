@@ -273,19 +273,29 @@ double expression::calculate() {
 		for (auto& literal : postfix) {
 			if (literal.second == type_of_literal::operand) {
 				if (is_in_vector(symbols, literal.first.back())) {
-					if (literal.first.front() == (char)special_signes::unary_minus) {
-						std::cout << "Please enter value of " << literal.first.substr(1) << ": ";
-						std::cin >> value_of_var;
-						value_of_var *= -1;
-						
+					if (variables.find(literal.first) == variables.end() || (literal.first.front() == (char)special_signes::unary_minus && variables.find(literal.first.substr(1))==variables.end())){
+						if (literal.first.front() == (char)special_signes::unary_minus) {
+							std::cout << "Please enter value of " << literal.first.substr(1) << ": ";
+							std::cin >> value_of_var;
+							value_of_var *= -1;
+							variables.emplace(literal.first.substr(1), value_of_var);
+						}
+						else {
+							std::cout << "Please enter value of " << literal.first << ": ";
+							std::cin >> value_of_var;
+							std::cout << std::endl;
+							variables.emplace(literal.first, value_of_var);
+						}
 					}
 					else {
-						std::cout << "Please enter value of " << literal.first << ": ";
-						std::cin >> value_of_var;
+						if (literal.first.front() == (char)special_signes::unary_minus) {
+							value_of_var = variables[literal.first.substr(1)];
+						}
+						else {
+							value_of_var = variables[literal.first];
+						}
 					}
 					
-					std::cout << std::endl;
-
 					values.push(value_of_var);
 				}
 
