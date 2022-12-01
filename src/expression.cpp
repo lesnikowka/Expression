@@ -44,7 +44,7 @@ bool expression::check_brackets() {
 }
 
 bool expression::split() {
-	states_of_waiting state = states_of_waiting::number_or_left_bracket_or_unary_minus;
+	states_of_waiting state = states_of_waiting::number_or_left_bracket_or_unary_minus_or_symbol;
 	std::vector<std::pair<std::string, type_of_literal>> tmp_split;
 
 	bool unaryMinusIsPreviousLiteral = false;
@@ -58,10 +58,41 @@ bool expression::split() {
 	for (size_t i = 0; i < infix_str.size(); i++) {
 		switch (state) {
 
-		case states_of_waiting::number_or_left_bracket_or_unary_minus:
+		case states_of_waiting::symbol_or_operation_or_right_bracket:
+			if(is_in_vector(symbols.cbegin(), symbols.cend(), infix_str[i]) || is_in_vector(operations.cbegin(), operations.cend(), infix_str[i])||infix_str[i]==(char)special_signes::right_bracket){
+				if (is_in_vector(symbols.cbegin(), symbols.cend(), infix_str[i])) {
+					if (i == infix_str.size() - 1) {
+						state = states_of_waiting::success;
+					}
+				}
+				if (is_in_vector(operations.cbegin(), operations.cend(), infix_str[i])) {
+					state = states_of_waiting::number_or_left_bracket_or_symbol;
+					tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(start, i - start), type_of_literal::operand));
+					tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(i, 1), type_of_literal::operation));
+					start = i + 1;
+				}
+				if (infix_str[i] == (char)special_signes::right_bracket) {
+					state = states_of_waiting::operation_or_right_bracket;
+					tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(start, i - start), type_of_literal::operand));
+					tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(i, 1), type_of_literal::right_bracket));
+					if (i == infix_str.size() - 1) {
+						state = states_of_waiting::success;
+					}
+				}
+			}
+			else {
+				return false;
+			}
+			break;
+			
+
+		case states_of_waiting::number_or_left_bracket_or_unary_minus_or_symbol:
 			unaryMinusIsPreviousLiteral = false;
-			if (is_in_vector(numbers.cbegin(), numbers.cend(), infix_str[i]) || infix_str[i] == (char)special_signes::left_bracket || infix_str[i] == (char)special_signes::unary_minus) {
-				if (is_in_vector(numbers.cbegin(), numbers.cend(), infix_str[i])) {
+			if (is_in_vector(numbers.cbegin(), numbers.cend(), infix_str[i]) || infix_str[i] == (char)special_signes::left_bracket || infix_str[i] == (char)special_signes::unary_minus|| is_in_vector(symbols.cbegin(), symbols.cend(), infix_str[i])) {
+				if (is_in_vector(symbols.cbegin(), symbols.cend(), infix_str[i])) {
+					state = states_of_waiting::symbol_or_operation_or_right_bracket;
+				}
+				else if (is_in_vector(numbers.cbegin(), numbers.cend(), infix_str[i])) {
 					state = states_of_waiting::number_or_operation_or_point_or_right_bracket;
 				}
 				else if (infix_str[i] == (char)special_signes::left_bracket) {
@@ -69,7 +100,7 @@ bool expression::split() {
 					start = i + 1;
 				}
 				else if (infix_str[i] == (char)special_signes::unary_minus) {
-					state = states_of_waiting::number_or_left_bracket;
+					state = states_of_waiting::number_or_left_bracket_or_symbol;
 					start = i;
 					unaryMinusIsPreviousLiteral = true;
 				}
@@ -82,13 +113,16 @@ bool expression::split() {
 			}
 			break;
 
-		case states_of_waiting::number_or_left_bracket:
-			if (is_in_vector(numbers.cbegin(), numbers.cend(), infix_str[i]) || infix_str[i] == (char)special_signes::left_bracket) {
-				if (is_in_vector(numbers.cbegin(), numbers.cend(), infix_str[i])) {
+		case states_of_waiting::number_or_left_bracket_or_symbol:
+			if (is_in_vector(numbers.cbegin(), numbers.cend(), infix_str[i]) || infix_str[i] == (char)special_signes::left_bracket || is_in_vector(symbols.cbegin(), symbols.cend(), infix_str[i])) {
+				if (is_in_vector(symbols.cbegin(), symbols.cend(), infix_str[i])) {
+					state = states_of_waiting::symbol_or_operation_or_right_bracket;
+				}
+				else if (is_in_vector(numbers.cbegin(), numbers.cend(), infix_str[i])) {
 					state = states_of_waiting::number_or_operation_or_point_or_right_bracket;
 				}
 				else if (infix_str[i] == (char)special_signes::left_bracket) {
-					state = states_of_waiting::number_or_left_bracket_or_unary_minus;
+					state = states_of_waiting::number_or_left_bracket_or_unary_minus_or_symbol;
 					if (unaryMinusIsPreviousLiteral) {
 						tmp_split.push_back(std::make_pair("-1", type_of_literal::operand));
 						tmp_split.push_back(std::make_pair("*", type_of_literal::operation));
@@ -118,7 +152,7 @@ bool expression::split() {
 					tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(i,1),type_of_literal::right_bracket));
 				}
 				else if (is_in_vector(operations.cbegin(), operations.cend(), infix_str[i])) {
-					state = states_of_waiting::number_or_left_bracket;
+					state = states_of_waiting::number_or_left_bracket_or_symbol;
 					tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(start, i - start), type_of_literal::operand));
 					tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(i,1), type_of_literal::operation));
 					start = i + 1;
@@ -150,7 +184,7 @@ bool expression::split() {
 					tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(i, 1), type_of_literal::right_bracket));
 				}
 				else if (is_in_vector(operations.cbegin(), operations.cend(), infix_str[i])) {
-					state = states_of_waiting::number_or_left_bracket;
+					state = states_of_waiting::number_or_left_bracket_or_symbol;
 					tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(start, i - start), type_of_literal::operand));
 					tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(i, 1), type_of_literal::operation));
 					start = i + 1;
@@ -183,7 +217,7 @@ bool expression::split() {
 		case states_of_waiting::operation_or_right_bracket:
 			if (infix_str[i] == (char)special_signes::right_bracket || is_in_vector(operations.cbegin(), operations.cend(), infix_str[i])) {
 				if (is_in_vector(operations.cbegin(), operations.cend(), infix_str[i])) {
-					state = states_of_waiting::number_or_left_bracket;
+					state = states_of_waiting::number_or_left_bracket_or_symbol;
 					if (i == infix_str.size() - 1) {
 						return false;
 					}
@@ -208,7 +242,7 @@ bool expression::split() {
 
 
 	if(state == states_of_waiting::success){
-		if (is_in_vector(numbers.cbegin(), numbers.cend(), infix_str[infix_str.size()-1])) {
+		if (is_in_vector(numbers.cbegin(), numbers.cend(), infix_str[infix_str.size()-1]) || is_in_vector(symbols.cbegin(), symbols.cend(), infix_str[infix_str.size() - 1])) {
 			tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(start, infix_str.size() - start),type_of_literal::operand));
 		};
 
@@ -223,14 +257,40 @@ double expression::calculate() {
 
 	if (split()) {
 
+		for (auto i : infix) {
+			std::cout << "\"" << i.first << "\", ";
+		}
+		std::cout << std::endl;
+
+
 		to_postfix();
-
+		
 		std::stack<double> values;
-
+		
 		double first_op, second_op;
+		double value_of_var;
 		for (auto& literal : postfix) {
 			if (literal.second == type_of_literal::operand) {
-				values.push(std::stod(literal.first));
+				if (is_in_vector(symbols.begin(), symbols.end(), literal.first.back())) {
+					if (literal.first.front() == (char)special_signes::unary_minus) {
+						std::cout << "Please enter value of " << literal.first.substr(1) << ": ";
+						std::cin >> value_of_var;
+						value_of_var *= -1;
+						
+					}
+					else {
+						std::cout << "Please enter value of " << literal.first << ": ";
+						std::cin >> value_of_var;
+					}
+					
+					std::cout << std::endl;
+
+					values.push(value_of_var);
+				}
+
+				else {
+					values.push(std::stod(literal.first));
+				}
 			}
 			else {
 				second_op = values.top();
@@ -243,7 +303,7 @@ double expression::calculate() {
 		return values.top();
 	}
 	else {
-		throw std::exception("expression is not correct");
+		std::cout << "expression is not correct" << std::endl;
 		return 0;
 	}
 }

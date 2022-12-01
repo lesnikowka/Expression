@@ -9,11 +9,12 @@
 class expression {
 	enum class states_of_waiting {
 		number,
-		number_or_left_bracket,
-		number_or_left_bracket_or_unary_minus,
+		number_or_left_bracket_or_symbol,
+		number_or_left_bracket_or_unary_minus_or_symbol,
 		number_or_operation_or_point_or_right_bracket,
 		number_or_operation_or_right_bracket,
 		operation_or_right_bracket,
+		symbol_or_operation_or_right_bracket,
 		success
 	};
 
@@ -39,6 +40,9 @@ class expression {
 	const std::vector<char> operations = { '+','-','*','/' };
 	const std::map<char, int> priorities = { {'+',0},{'-',0},{'*',1},{'/',1} };
 	const std::vector<char> numbers = { '1','2', '3', '4', '5', '6', '7', '8', '9', '0' };
+	const std::vector<char> symbols = { 'q', 'Q', 'w', 'W', 'e', 'E', 'r', 'R', 't', 'T', 'y', 'Y', 'u',
+		'U', 'i', 'I', 'o', 'O', 'p', 'P', 'a', 'A', 's', 'S', 'd', 'D', 'f', 'F', 'g', 'G', 'h', 'H',
+		'j', 'J', 'k', 'K', 'l', 'L', 'z', 'Z', 'x', 'X', 'c', 'C', 'v', 'V', 'b', 'B', 'n', 'N', 'm', 'M', '_' };
 
 
 	bool split();
