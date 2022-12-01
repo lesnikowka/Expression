@@ -47,7 +47,7 @@ class expression {
 
 	bool split();
 	bool check_brackets();
-	bool is_in_vector(std::vector<char>::const_iterator i1, std::vector<char>::const_iterator i2, char val);
+	bool is_in_vector(const std::vector<char>& v, char value);
 	double operate(double first, double second, char operation);
 
 	void to_postfix();
