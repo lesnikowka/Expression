@@ -1,4 +1,5 @@
 #include "expression.h"
+#include <exception>
 
 expression::expression(std::string str) : infix_str(str) {}
 expression::expression(const expression& ex) : infix_str(ex.infix_str),postfix_str(ex.postfix_str), infix(ex.infix), postfix(ex.postfix) {}
