@@ -25,7 +25,7 @@ include_directories("${MP2_INCLUDE}" gtest)
 
 # BUILD
 add_subdirectory(src)
-add_subdirectory(samples)
+#add_subdirectory(samples)
 add_subdirectory(gtest)
 add_subdirectory(test)
 
