@@ -4,6 +4,9 @@ expression::expression(std::string str) : infix_str(str) {}
 expression::expression(const expression& ex) : infix_str(ex.infix_str),postfix_str(ex.postfix_str), infix(ex.infix), postfix(ex.postfix) {}
 expression::expression(std::string str, std::initializer_list<std::pair<std::string, double>> list) : expression(str) {
 	for (auto i : list) {
+		if (variables.find(i.first) != variables.end()) 
+			throw std::exception("you can't change constants");
+		
 		variables.insert(i);
 	}
 }
@@ -17,6 +20,8 @@ double expression::operate(double first, double second, char operation) {
 	case '*':
 		return first * second;
 	case '/':
+		if (second == 0)
+			throw std::exception("division by zero");
 		return first / second;
 	}
 	return 0;
@@ -255,6 +260,11 @@ bool expression::split() {
 			tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(start, infix_str.size() - start),type_of_literal::operand));
 		};
 
+		//for (auto i : tmp_split) {
+		//	std::cout << "\"" << i.first << "\",   ";
+		//}
+		//std::cout << std::endl;
+
 		infix = tmp_split;
 		return true;
 	}
@@ -270,7 +280,6 @@ double expression::calculate() {
 		std::stack<double> values;
 		
 		double first_op, second_op;
-		double value_of_var;
 
 		for (auto i : postfix) {
 			if (i.second == type_of_literal::operand)
@@ -335,10 +344,10 @@ double expression::request_variables(std::string var) {
 			std::cout << var.substr(1) << ": ";
 			std::cin >> value;
 			std::cout << std::endl;
-			variables.emplace(var.substr(1), value);
+			variables.emplace(var.substr(1), -value);
 		}
 		else 
-			value = variables[var.substr(1)];
+			value = -variables[var.substr(1)];
 	}
 	else{
 		if (variables.find(var) == variables.end()) {

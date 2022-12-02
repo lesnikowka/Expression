@@ -46,8 +46,8 @@ class expression {
 		'j', 'J', 'k', 'K', 'l', 'L', 'z', 'Z', 'x', 'X', 'c', 'C', 'v', 'V', 'b', 'B', 'n', 'N', 'm', 'M', '_' };
 
 	
-	std::map<std::string, double> constants = { std::make_pair("pi",3.14159265358979323846), 
-												std::make_pair("e", 2.71828182845904523536)
+	std::map<std::string, double> constants = { {"pi",3.14159265358979323846},
+												{"e", 2.71828182845904523536}
 												};
 	std::map<std::string, double> variables = constants;
 	
