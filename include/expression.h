@@ -6,6 +6,7 @@
 #include <map>
 #include <initializer_list>
 #include <iostream>
+#include <exception>
 
 class expression {
 	enum class states_of_waiting {
