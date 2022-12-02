@@ -336,17 +336,34 @@ double expression::request_variables(std::string var) {
 		value = std::stod(var);
 
 	else if (var.front() == (char)special_signes::unary_minus) {
-		if (variables.find(var.substr(1)) == variables.end()) 
+		if (variables.find(var.substr(1)) == variables.end() && !from_console) 
 			throw std::exception("variable was not input");
-		else 
+		else if (variables.find(var.substr(1)) != variables.end()) {
 			value = -variables[var.substr(1)];
+		}
+		else {
+			std::cout << var.substr(1) << " = ";
+			std::cin >> value;
+			std::cout << std::endl;
+			variables.emplace(var.substr(1), value);
+			value = -value;
+		}
+		
 	}
 
 	else{
-		if (variables.find(var) == variables.end()) 
+		if (variables.find(var) == variables.end() && !from_console) 
 			throw std::exception("variable was not input");
-		else
+		else if (variables.find(var) != variables.end()) {
 			value = variables[var];
+		}
+		else {
+			std::cout << var << " = ";
+			std::cin >> value;
+			std::cout << std::endl;
+			variables.emplace(var, value);
+			value = value;
+		}
 	}
 
 	return value;

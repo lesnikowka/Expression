@@ -5,6 +5,7 @@
 #include <stack>
 #include <map>
 #include <initializer_list>
+#include <iostream>
 
 class expression {
 	enum class states_of_waiting {
@@ -35,6 +36,8 @@ class expression {
 	std::vector<std::pair<std::string, type_of_literal>> infix;
 	std::vector<std::pair<std::string, type_of_literal>> postfix;
 
+	bool from_console = false;
+
 	const std::vector<char> operations = { '+','-','*','/' };
 	const std::map<char, int> priorities = { {'+',0},{'-',0},{'*',1},{'/',1} };
 	const std::vector<char> left_brackets = { '(','[','{' };
@@ -59,10 +62,16 @@ class expression {
 	void to_postfix();
 
 public:
-	expression() = delete;
+	expression() = default;
 	expression(std::string str);
 	expression(const expression& ex);
 	expression(std::string str, std::initializer_list<std::pair<std::string, double>> list);
+
+	friend std::istream& operator>>(std::istream& in, expression& ex) {
+		in >> ex.infix_str;
+		ex.from_console = true;
+		return in;
+	}
 
 	std::string get_infix();
 	std::string get_postfix();
