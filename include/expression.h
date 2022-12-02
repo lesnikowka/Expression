@@ -5,6 +5,7 @@
 #include <stack>
 #include <iostream>
 #include <map>
+#include <initializer_list>
 
 class expression {
 	enum class states_of_waiting {
@@ -27,8 +28,6 @@ class expression {
 
 	enum class special_signes {
 		point = '.',
-		right_bracket = ')',
-		left_bracket = '(',
 		unary_minus = '-'
 	};
 
@@ -39,18 +38,24 @@ class expression {
 
 	const std::vector<char> operations = { '+','-','*','/' };
 	const std::map<char, int> priorities = { {'+',0},{'-',0},{'*',1},{'/',1} };
+	const std::vector<char> left_brackets = { '(','[','{' };
+	const std::vector<char> right_brackets = { ')',']','}' };
 	const std::vector<char> numbers = { '1','2', '3', '4', '5', '6', '7', '8', '9', '0' };
 	const std::vector<char> symbols = { 'q', 'Q', 'w', 'W', 'e', 'E', 'r', 'R', 't', 'T', 'y', 'Y', 'u',
 		'U', 'i', 'I', 'o', 'O', 'p', 'P', 'a', 'A', 's', 'S', 'd', 'D', 'f', 'F', 'g', 'G', 'h', 'H',
 		'j', 'J', 'k', 'K', 'l', 'L', 'z', 'Z', 'x', 'X', 'c', 'C', 'v', 'V', 'b', 'B', 'n', 'N', 'm', 'M', '_' };
 
-	std::map<std::string, double> variables;
-
-
+	
+	std::map<std::string, double> constants = { std::make_pair("pi",3.14159265358979323846), 
+												std::make_pair("e", 2.71828182845904523536)
+												};
+	std::map<std::string, double> variables = constants;
+	
 	bool split();
 	bool check_brackets();
 	bool is_in_vector(const std::vector<char>& v, char value);
 	double operate(double first, double second, char operation);
+	double request_variables(std::string var);
 
 	void to_postfix();
 
@@ -58,6 +63,7 @@ public:
 	expression() = delete;
 	expression(std::string str);
 	expression(const expression& ex);
+	expression(std::string str, std::initializer_list<std::pair<std::string, double>> list);
 
 	std::string get_infix();
 	std::string get_postfix();
