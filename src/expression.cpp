@@ -1,12 +1,11 @@
 #include "expression.h"
-#include <exception>
 
 expression::expression(std::string str) : infix_str(str) {}
 expression::expression(const expression& ex) : infix_str(ex.infix_str),postfix_str(ex.postfix_str), infix(ex.infix), postfix(ex.postfix) {}
 expression::expression(std::string str, std::initializer_list<std::pair<std::string, double>> list) : expression(str) {
 	for (auto i : list) {
 		if (variables.find(i.first) != variables.end()) 
-			throw std::exception("you can't change constants");
+			throw "you can't change constants";
 		
 		variables.insert(i);
 	}
@@ -22,7 +21,7 @@ double expression::operate(double first, double second, char operation) {
 		return first * second;
 	case '/':
 		if (second == 0)
-			throw std::exception("division by zero");
+			throw "division by zero";
 		return first / second;
 	}
 	return 0;
@@ -292,7 +291,7 @@ double expression::calculate() {
 		return values.top();
 	}
 	else {
-		throw std::exception("incorrect expression");
+		throw "incorrect expression";
 		return 0;
 	}
 }
@@ -338,7 +337,7 @@ double expression::request_variables(std::string var) {
 
 	else if (var.front() == (char)special_signes::unary_minus) {
 		if (variables.find(var.substr(1)) == variables.end() && !from_console) 
-			throw std::exception("variable was not input");
+			throw "variable was not input";
 		else if (variables.find(var.substr(1)) != variables.end()) {
 			value = -variables[var.substr(1)];
 		}
@@ -354,7 +353,7 @@ double expression::request_variables(std::string var) {
 
 	else{
 		if (variables.find(var) == variables.end() && !from_console) 
-			throw std::exception("variable was not input");
+			throw "variable was not input";
 		else if (variables.find(var) != variables.end()) {
 			value = variables[var];
 		}
