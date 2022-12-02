@@ -260,11 +260,6 @@ bool expression::split() {
 			tmp_split.push_back(std::pair<std::string, type_of_literal>(infix_str.substr(start, infix_str.size() - start),type_of_literal::operand));
 		};
 
-		//for (auto i : tmp_split) {
-		//	std::cout << "\"" << i.first << "\",   ";
-		//}
-		//std::cout << std::endl;
-
 		infix = tmp_split;
 		return true;
 	}
@@ -296,7 +291,7 @@ double expression::calculate() {
 		return values.top();
 	}
 	else {
-		std::cout << "expression is not correct" << std::endl;
+		throw std::exception("incorrect expression");
 		return 0;
 	}
 }
@@ -335,30 +330,25 @@ void expression::to_postfix() {
 }
 
 double expression::request_variables(std::string var) {
-	if (!is_in_vector(symbols, var.back()))
-		return std::stod(var);
-
 	double value;
-	if (var.front() == (char)special_signes::unary_minus) {
-		if (variables.find(var.substr(1)) == variables.end()) {
-			std::cout << var.substr(1) << ": ";
-			std::cin >> value;
-			std::cout << std::endl;
-			variables.emplace(var.substr(1), -value);
-		}
+
+	if (!is_in_vector(symbols, var.back()))
+		value = std::stod(var);
+
+	else if (var.front() == (char)special_signes::unary_minus) {
+		if (variables.find(var.substr(1)) == variables.end()) 
+			throw std::exception("variable was not input");
 		else 
 			value = -variables[var.substr(1)];
 	}
+
 	else{
-		if (variables.find(var) == variables.end()) {
-			std::cout << var << ": ";
-			std::cin >> value;
-			std::cout << std::endl;
-			variables.emplace(var, value);
-		}
+		if (variables.find(var) == variables.end()) 
+			throw std::exception("variable was not input");
 		else
 			value = variables[var];
 	}
+
 	return value;
 }
 
