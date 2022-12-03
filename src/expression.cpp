@@ -14,7 +14,7 @@ expression::expression(std::string str, std::initializer_list<std::pair<std::str
 		
 		variables.insert(i);
 	}
-}//
+}
 
 double expression::operate(double first, double second, char operation) {
 	switch (operation) {
