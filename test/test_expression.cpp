@@ -195,7 +195,6 @@ TEST(expression, can_devide_negative_variable_by_negative_variable) {
 	EXPECT_EQ(ex.calculate(), 0.25);
 }
 
-//////////////////
 TEST(expression, can_multiply_positive_number_by_positive_number) {
 	expression ex("2*8");
 
@@ -279,4 +278,16 @@ TEST(expression, can_add_and_devide_correctly) {
 	expression ex("1+1/2");
 
 	EXPECT_EQ(ex.calculate(), 1.5);
+}
+
+TEST(expression, throw_if_incorrect_ex_operation_on_back) {
+	ASSERT_ANY_THROW(expression ex("1+2+3*"));
+}
+
+TEST(expression, throw_if_incorrect_ex_operation_on_front) {
+	ASSERT_ANY_THROW(expression ex("/1+2+3"));
+}
+
+TEST(expression, throw_if_incorrect_ex_double_operation) {
+	ASSERT_ANY_THROW(expression ex("1+2+3++4"));
 }
