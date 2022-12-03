@@ -11,7 +11,7 @@ endif()
 
 
 set(MP2_LIBRARY "${PROJECT_NAME}")
-set(MP2_TESTS   "test_${PROJECT_NAME}")
+set(MP2_TESTS   "test_${PROJECT_NAME}/test")
 set(MP2_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 include_directories("${MP2_INCLUDE}" gtest)
