@@ -252,7 +252,7 @@ TEST(expression, throw_ex_with_wrong_brackets_1) {
 TEST(expression, throw_ex_with_wrong_brackets_2) {
 
 	ASSERT_ANY_THROW(expression ex(")("));
-}
+}//
 
 TEST(expression, throw_ex_with_wrong_brackets_3) {
 
