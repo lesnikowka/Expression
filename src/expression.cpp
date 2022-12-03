@@ -1,6 +1,11 @@
 #include "expression.h"
 
-expression::expression(std::string str) : infix_str(str) {}
+expression::expression(std::string str) : infix_str(str) {
+	if (!split()) 
+		throw "incorrect input";
+	to_postfix();
+
+}
 expression::expression(const expression& ex) : infix_str(ex.infix_str),postfix_str(ex.postfix_str), infix(ex.infix), postfix(ex.postfix) {}
 expression::expression(std::string str, std::initializer_list<std::pair<std::string, double>> list) : expression(str) {
 	for (auto i : list) {
@@ -268,32 +273,34 @@ bool expression::split() {
 }
 
 double expression::calculate() {
+	std::stack<double> values;
+	
+	double first_op, second_op;
 
-	if (split()) {
-		to_postfix();
-		
-		std::stack<double> values;
-		
-		double first_op, second_op;
-
-		for (auto i : postfix) {
-			if (i.second == type_of_literal::operand)
-				values.push(request_variables(i.first));
+	for (auto i : postfix) {
+		std::string literal = i.first;
+		if (i.second == type_of_literal::operand) {
+			if (is_in_vector(symbols, i.first.back())) {
+				if (i.first.front() == (char)special_signes::unary_minus)
+					literal = literal.substr(1);
+				if (variables.find(literal) == variables.end()) throw "variable was not input";
+				values.push(variables[literal] * (1 - 2 * (int)(i.first.front() == (char)special_signes::unary_minus)));
+			}
 			else {
-				second_op = values.top();
-				values.pop();
-				first_op = values.top();
-				values.pop();
-				values.push(operate(first_op, second_op, i.first.front()));
-			}	
+				values.push(std::stod(literal));
+			}
 		}
-		
-		return values.top();
+			
+		else {
+			second_op = values.top();
+			values.pop();
+			first_op = values.top();
+			values.pop();
+			values.push(operate(first_op, second_op, i.first.front()));
+		}	
 	}
-	else {
-		throw "incorrect expression";
-		return 0;
-	}
+	
+	return values.top();
 }
 
 void expression::to_postfix() {
@@ -329,43 +336,25 @@ void expression::to_postfix() {
 		postfix_str += literal.first;
 }
 
-double expression::request_variables(std::string var) {
+void expression::request_variables() {
 	double value;
 
-	if (!is_in_vector(symbols, var.back()))
-		value = std::stod(var);
+	for (auto var : infix) {
+		if (is_in_vector(symbols, var.first.back())) {
+			if (var.first.front() == (char)special_signes::unary_minus && variables.find(var.first.substr(1)) == variables.end()) {
+				std::cout << var.first.substr(1) << " = ";
+				std::cin >> value;
+				std::cout << std::endl;
+				variables.emplace(var.first.substr(1), -value);
+			}
 
-	else if (var.front() == (char)special_signes::unary_minus) {
-		if (variables.find(var.substr(1)) == variables.end() && !from_console) 
-			throw "variable was not input";
-		else if (variables.find(var.substr(1)) != variables.end()) {
-			value = -variables[var.substr(1)];
-		}
-		else {
-			std::cout << var.substr(1) << " = ";
-			std::cin >> value;
-			std::cout << std::endl;
-			variables.emplace(var.substr(1), value);
-			value = -value;
-		}
-		
-	}
-
-	else{
-		if (variables.find(var) == variables.end() && !from_console) 
-			throw "variable was not input";
-		else if (variables.find(var) != variables.end()) {
-			value = variables[var];
-		}
-		else {
-			std::cout << var << " = ";
-			std::cin >> value;
-			std::cout << std::endl;
-			variables.emplace(var, value);
-			value = value;
+			else if(variables.find(var.first) == variables.end()){
+				std::cout << var.first << " = ";
+				std::cin >> value;
+				std::cout << std::endl;
+				variables.emplace(var.first, value);
+			}
 		}
 	}
-
-	return value;
 }
 

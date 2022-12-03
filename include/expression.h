@@ -37,8 +37,6 @@ class expression {
 	std::vector<std::pair<std::string, type_of_literal>> infix;
 	std::vector<std::pair<std::string, type_of_literal>> postfix;
 
-	bool from_console = false;
-
 	const std::vector<char> operations = { '+','-','*','/' };
 	const std::map<char, int> priorities = { {'+',0},{'-',0},{'*',1},{'/',1} };
 	const std::vector<char> left_brackets = { '(','[','{' };
@@ -58,7 +56,7 @@ class expression {
 	bool check_brackets();
 	bool is_in_vector(const std::vector<char>& v, char value);
 	double operate(double first, double second, char operation);
-	double request_variables(std::string var);
+	void request_variables();
 
 	void to_postfix();
 
@@ -70,7 +68,10 @@ public:
 
 	friend std::istream& operator>>(std::istream& in, expression& ex) {
 		in >> ex.infix_str;
-		ex.from_console = true;
+		if (!ex.split())
+			throw "incorrect input";
+		ex.to_postfix();
+		ex.request_variables();
 		return in;
 	}
 
