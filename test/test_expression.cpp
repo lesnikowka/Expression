@@ -4,7 +4,7 @@
 TEST(expression, throw_if_div_by_zero_number) {
 	expression ex("1/0");
 	ASSERT_ANY_THROW(ex.calculate());
-}
+}//
 
 TEST(expression, throw_if_div_by_zero_value) {
 	expression ex("1/(2-2)");
