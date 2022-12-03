@@ -63,7 +63,7 @@ class expression {
 public:
 	expression() = default;
 	expression(std::string str);
-	expression(const expression& ex);
+	expression(const expression& ex)=default;
 	expression(std::string str, std::initializer_list<std::pair<std::string, double>> list);
 
 	friend std::istream& operator>>(std::istream& in, expression& ex) {
@@ -75,8 +75,8 @@ public:
 		return in;
 	}
 
-	std::string get_infix();
-	std::string get_postfix();
+	std::string get_infix() { return infix_str; }
+	std::string get_postfix() { return postfix_str; }
 
 	double calculate();
 };

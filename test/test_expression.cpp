@@ -1,10 +1,42 @@
 #include "expression.h"
 #include <gtest.h>
 
+TEST(expression, can_translate_to_postfix_1) {
+	expression ex("a+b", { { "a", 1 }, {"b",2}});
+
+	EXPECT_EQ(ex.get_postfix(), "ab+");
+}
+
+TEST(expression, can_translate_to_postfix_2) {
+	expression ex("-a-b", { { "a", 1 }, {"b",2} });
+
+	EXPECT_EQ(ex.get_postfix(), "-ab-");
+}
+
+TEST(expression, can_translate_to_postfix_3) {
+	expression ex("a+b*c", { { "a", 1 }, {"b",2},{"c",3}});
+
+	EXPECT_EQ(ex.get_postfix(), "abc*+");
+}
+
+TEST(expression, can_translate_to_postfix_4) {
+	expression ex("a*b+c", { { "a", 1 }, {"b",2},{"c",3} });
+
+	EXPECT_EQ(ex.get_postfix(), "ab*c+");;
+}
+
+TEST(expression, can_translate_to_postfix_5) {
+	expression ex("(a+b*c)*(c/d-e)", { { "a", 1 }, {"b",2},{"c",3},{"d",4} }); // e - constant
+
+	std::cout << ex.get_postfix();
+
+	EXPECT_EQ(ex.get_postfix(), "abc*+cd/e-*");;
+}
+
 TEST(expression, throw_if_div_by_zero_number) {
 	expression ex("1/0");
 	ASSERT_ANY_THROW(ex.calculate());
-}//
+}
 
 TEST(expression, throw_if_div_by_zero_value) {
 	expression ex("1/(2-2)");

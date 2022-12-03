@@ -6,7 +6,7 @@ expression::expression(std::string str) : infix_str(str) {
 	to_postfix();
 
 }
-expression::expression(const expression& ex) : infix_str(ex.infix_str),postfix_str(ex.postfix_str), infix(ex.infix), postfix(ex.postfix) {}
+
 expression::expression(std::string str, std::initializer_list<std::pair<std::string, double>> list) : expression(str) {
 	for (auto i : list) {
 		if (variables.find(i.first) != variables.end()) 
@@ -31,14 +31,6 @@ double expression::operate(double first, double second, char operation) {
 	}
 	return 0;
 }
-
-std::string expression::get_infix() { 
-	return infix_str; 
-}
-std::string expression::get_postfix() {
-	return postfix_str;
-}
-
 
 bool expression::is_in_vector(const std::vector<char>& v, char value) {
 	return std::find(v.begin(), v.end(), value) != v.end();
@@ -332,7 +324,7 @@ void expression::to_postfix() {
 		postfix.push_back(stack.top());
 		stack.pop();
 	}
-	for (auto& literal : postfix)
+	for (auto literal : postfix)
 		postfix_str += literal.first;
 }
 
