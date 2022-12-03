@@ -245,33 +245,28 @@ TEST(expression, can_multiply_negative_variable_by_negative_variable) {
 }
 
 TEST(expression, throw_ex_with_wrong_brackets_1) {
-	expression ex("(()");
 
-	ASSERT_ANY_THROW(ex.calculate());
+	ASSERT_ANY_THROW(expression ex("(()"));
 }
 
 TEST(expression, throw_ex_with_wrong_brackets_2) {
-	expression ex(")(");
 
-	ASSERT_ANY_THROW(ex.calculate());
+	ASSERT_ANY_THROW(expression ex(")("));
 }
 
 TEST(expression, throw_ex_with_wrong_brackets_3) {
-	expression ex("())");
 
-	ASSERT_ANY_THROW(ex.calculate());
+	ASSERT_ANY_THROW(expression ex("())"));
 }
 
 TEST(expression, throw_ex_with_wrong_brackets_4) {
-	expression ex("()(");
-
-	ASSERT_ANY_THROW(ex.calculate());
+	
+	ASSERT_ANY_THROW(expression ex("()("));
 }
 
 TEST(expression, throw_ex_with_wrong_brackets_5) {
-	expression ex(")()");
 
-	ASSERT_ANY_THROW(ex.calculate());
+	ASSERT_ANY_THROW(expression ex(")()"));
 }
 
 TEST(expression, can_add_and_multiply_correctly) {
