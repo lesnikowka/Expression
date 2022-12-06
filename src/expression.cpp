@@ -51,6 +51,7 @@ void expression::clear() {
 
 void expression::change_expression(std::string ex) {
 	clear();
+	infix_str = ex;
 	if (!split())
 		throw "incorrect input";
 	to_postfix();
