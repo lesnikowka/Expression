@@ -32,6 +32,30 @@ double expression::operate(double first, double second, char operation) {
 	return 0;
 }
 
+void expression::add_variable(std::pair<std::string, double> var){
+	if (variables.find(var.first) != variables.end()) {
+		throw "variable was added earlier";
+	}
+	else {
+		variables.insert(var);
+	}
+}
+
+void expression::clear() {
+	variables = constants;
+	infix_str.clear();
+	postfix_str.clear();
+	infix.clear();
+	postfix.clear();
+}
+
+void expression::change_expression(std::string ex) {
+	clear();
+	if (!split())
+		throw "incorrect input";
+	to_postfix();
+}
+
 bool expression::is_in_vector(const std::vector<char>& v, char value) {
 	return std::find(v.begin(), v.end(), value) != v.end();
 }

@@ -60,13 +60,20 @@ class expression {
 
 	void to_postfix();
 
+	void clear();
+
 public:
 	expression() = default;
 	expression(std::string str);
 	expression(const expression& ex)=default;
 	expression(std::string str, std::initializer_list<std::pair<std::string, double>> list);
 
+	void add_variable(std::pair<std::string, double> var);
+
+	void change_expression(std::string ex);
+
 	friend std::istream& operator>>(std::istream& in, expression& ex) {
+		ex.clear();
 		in >> ex.infix_str;
 		if (!ex.split())
 			throw "incorrect input";
