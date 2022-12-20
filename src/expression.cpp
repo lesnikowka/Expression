@@ -9,8 +9,7 @@ expression::expression(std::string str) : infix_str(str) {
 
 expression::expression(std::string str, std::initializer_list<std::pair<std::string, double>> list) : expression(str) {
 	for (auto i : list) {
-		if (variables.find(i.first) != variables.end()) 
-			throw "you can't change constants";
+		add_variable(i);
 		
 		variables.insert(i);
 	}
@@ -33,7 +32,10 @@ double expression::operate(double first, double second, char operation) {
 }
 
 void expression::add_variable(std::pair<std::string, double> var){
-	if (variables.find(var.first) != variables.end()) {
+	if (!correct_name(var.first)) {
+		throw "incorrect name of variable";
+	}
+	else if (variables.find(var.first) != variables.end()) {
 		throw "variable was added earlier";
 	}
 	else {
@@ -55,6 +57,13 @@ void expression::change_expression(std::string ex) {
 	if (!split())
 		throw "incorrect input";
 	to_postfix();
+}
+
+bool expression::correct_name(std::string var) {
+	for (auto i : var)
+		if (!is_in_vector(symbols, i))
+			return false;
+	return true;
 }
 
 bool expression::is_in_vector(const std::vector<char>& v, char value) {
@@ -362,14 +371,14 @@ void expression::request_variables() {
 				std::cout << var.first.substr(1) << " = ";
 				std::cin >> value;
 				std::cout << std::endl;
-				variables.emplace(var.first.substr(1), -value);
+				add_variable(std::make_pair(var.first.substr(1),-value));
 			}
 
 			else if(variables.find(var.first) == variables.end()){
 				std::cout << var.first << " = ";
 				std::cin >> value;
 				std::cout << std::endl;
-				variables.emplace(var.first, value);
+				add_variable(std::make_pair(var.first, value));
 			}
 		}
 	}

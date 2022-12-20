@@ -57,6 +57,7 @@ class expression {
 	bool is_in_vector(const std::vector<char>& v, char value);
 	double operate(double first, double second, char operation);
 	void request_variables();
+	bool correct_name(std::string var);
 
 	void to_postfix();
 
