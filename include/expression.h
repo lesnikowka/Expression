@@ -63,6 +63,12 @@ class expression {
 
 	void clear();
 
+	bool is_number(char value);
+	bool is_symbol(char value);
+	bool is_right_bracket(char value);
+	bool is_left_bracket(char value);
+	bool is_operation(char value);
+
 public:
 	expression() = default;
 	expression(std::string str);
