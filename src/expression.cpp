@@ -106,7 +106,7 @@ bool expression::check_brackets() {
 
 bool expression::split() {
 	states_of_waiting state = states_of_waiting::number_or_left_bracket_or_unary_minus_or_symbol;
-	std::vector<std::pair<std::string, type_of_literal>> tmp_split;
+	std::vector<std::pair<std::string, type>> tmp_split;
 
 	bool unaryMinusIsPreviousLiteral = false;
 
@@ -129,14 +129,14 @@ bool expression::split() {
 				}
 				if (is_operation(symbol)) {
 					state = states_of_waiting::number_or_left_bracket_or_symbol;
-					tmp_split.push_back({ infix_str.substr(start, i - start), type_of_literal::operand });
-					tmp_split.push_back({infix_str.substr(i, 1), type_of_literal::operation});
+					tmp_split.push_back({ infix_str.substr(start, i - start), type::operand });
+					tmp_split.push_back({infix_str.substr(i, 1), type::operation});
 					start = i + 1;
 				}
 				if (is_right_bracket(symbol)) {
 					state = states_of_waiting::operation_or_right_bracket;
-					tmp_split.push_back({infix_str.substr(start, i - start), type_of_literal::operand});
-					tmp_split.push_back({infix_str.substr(i, 1), type_of_literal::right_bracket});
+					tmp_split.push_back({infix_str.substr(start, i - start), type::operand});
+					tmp_split.push_back({infix_str.substr(i, 1), type::right_bracket});
 					if (i == infix_str.size() - 1) {
 						state = states_of_waiting::success;
 					}
@@ -158,7 +158,7 @@ bool expression::split() {
 					state = states_of_waiting::number_or_operation_or_point_or_right_bracket;
 				}
 				else if (is_left_bracket(symbol)) {
-					tmp_split.push_back({infix_str.substr(i,1),type_of_literal::left_bracket});
+					tmp_split.push_back({infix_str.substr(i,1),type::left_bracket});
 					start = i + 1;
 				}
 				else if (symbol == (char)special_signes::unary_minus) {
@@ -186,10 +186,10 @@ bool expression::split() {
 				else if (is_left_bracket(symbol)) {
 					state = states_of_waiting::number_or_left_bracket_or_unary_minus_or_symbol;
 					if (unaryMinusIsPreviousLiteral) {
-						tmp_split.push_back(std::make_pair("-1", type_of_literal::operand));
-						tmp_split.push_back(std::make_pair("*", type_of_literal::operation));
+						tmp_split.push_back(std::make_pair("-1", type::operand));
+						tmp_split.push_back(std::make_pair("*", type::operation));
 					}
-					tmp_split.push_back({infix_str.substr(i,1), type_of_literal::left_bracket});
+					tmp_split.push_back({infix_str.substr(i,1), type::left_bracket});
 					start = i + 1;
 				}
 				if (i == infix_str.size() - 1) {
@@ -210,13 +210,13 @@ bool expression::split() {
 					if (i == infix_str.size() - 1) {
 						state = states_of_waiting::success;
 					}
-					tmp_split.push_back({infix_str.substr(start, i - start),type_of_literal::operand});
-					tmp_split.push_back({infix_str.substr(i,1),type_of_literal::right_bracket});
+					tmp_split.push_back({infix_str.substr(start, i - start),type::operand});
+					tmp_split.push_back({infix_str.substr(i,1),type::right_bracket});
 				}
 				else if (is_operation(symbol)) {
 					state = states_of_waiting::number_or_left_bracket_or_symbol;
-					tmp_split.push_back({infix_str.substr(start, i - start), type_of_literal::operand});
-					tmp_split.push_back({infix_str.substr(i,1), type_of_literal::operation});
+					tmp_split.push_back({infix_str.substr(start, i - start), type::operand});
+					tmp_split.push_back({infix_str.substr(i,1), type::operation});
 					start = i + 1;
 				}
 				else if (is_in_vector(numbers, symbol)) {
@@ -242,13 +242,13 @@ bool expression::split() {
 					if (i == infix_str.size() - 1) {
 						state = states_of_waiting::success;
 					}
-					tmp_split.push_back({infix_str.substr(start, i - start), type_of_literal::operand});
-					tmp_split.push_back({infix_str.substr(i, 1), type_of_literal::right_bracket});
+					tmp_split.push_back({infix_str.substr(start, i - start), type::operand});
+					tmp_split.push_back({infix_str.substr(i, 1), type::right_bracket});
 				}
 				else if (is_operation(symbol)) {
 					state = states_of_waiting::number_or_left_bracket_or_symbol;
-					tmp_split.push_back({infix_str.substr(start, i - start), type_of_literal::operand});
-					tmp_split.push_back({infix_str.substr(i, 1), type_of_literal::operation});
+					tmp_split.push_back({infix_str.substr(start, i - start), type::operand});
+					tmp_split.push_back({infix_str.substr(i, 1), type::operation});
 					start = i + 1;
 				}
 				else if (is_in_vector(numbers, symbol)) {
@@ -283,7 +283,7 @@ bool expression::split() {
 					if (i == infix_str.size() - 1) {
 						return false;
 					}
-					tmp_split.push_back({infix_str.substr(i,1),type_of_literal::operation});
+					tmp_split.push_back({infix_str.substr(i,1),type::operation});
 					start = i + 1;
 				}
 				else {
@@ -291,7 +291,7 @@ bool expression::split() {
 						state = states_of_waiting::success;
 					}
 					start = i + 1;
-					tmp_split.push_back({infix_str.substr(i,1),type_of_literal::right_bracket});
+					tmp_split.push_back({infix_str.substr(i,1),type::right_bracket});
 				}
 				unaryMinusIsPreviousLiteral = false;
 			}
@@ -305,7 +305,7 @@ bool expression::split() {
 
 	if(state == states_of_waiting::success){
 		if (is_in_vector(numbers, infix_str[infix_str.size()-1]) || is_in_vector(symbols, infix_str[infix_str.size() - 1])) {
-			tmp_split.push_back({infix_str.substr(start, infix_str.size() - start),type_of_literal::operand});
+			tmp_split.push_back({infix_str.substr(start, infix_str.size() - start),type::operand});
 		};
 
 		infix = tmp_split;
@@ -322,7 +322,7 @@ double expression::calculate() {
 
 	for (auto i : postfix) {
 		std::string literal = i.first;
-		if (i.second == type_of_literal::operand) {
+		if (i.second == type::operand) {
 			if (is_in_vector(symbols, i.first.back())) {
 				if (i.first.front() == (char)special_signes::unary_minus)
 					literal = literal.substr(1);
@@ -347,24 +347,24 @@ double expression::calculate() {
 }
 
 void expression::to_postfix() {
-	std::stack<std::pair<std::string, type_of_literal>> stack;
+	std::stack<std::pair<std::string, type>> stack;
 
 	for (const auto& literal : infix) {
-		if (literal.second == type_of_literal::operand) {
+		if (literal.second == type::operand) {
 			postfix.push_back({literal.first, literal.second});
 		}
-		else if (literal.second == type_of_literal::left_bracket) {
-			stack.push(std::pair<std::string, type_of_literal>(literal.first, literal.second));
+		else if (literal.second == type::left_bracket) {
+			stack.push(std::pair<std::string, type>(literal.first, literal.second));
 		}
-		else if (literal.second == type_of_literal::right_bracket) {
-			while (!stack.empty() && stack.top().second != type_of_literal::left_bracket) {
+		else if (literal.second == type::right_bracket) {
+			while (!stack.empty() && stack.top().second != type::left_bracket) {
 				postfix.push_back({stack.top().first, stack.top().second});
 				stack.pop();
 			}
 			stack.pop();
 		}
-		else if (literal.second == type_of_literal::operation){
-			while (!stack.empty() && stack.top().second == type_of_literal::operation && (*priorities.find(literal.first[0])).second <= (*priorities.find(stack.top().first[0])).second) {
+		else if (literal.second == type::operation){
+			while (!stack.empty() && stack.top().second == type::operation && (*priorities.find(literal.first[0])).second <= (*priorities.find(stack.top().first[0])).second) {
 				postfix.push_back(stack.top());
 				stack.pop();
 			}

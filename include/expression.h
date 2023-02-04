@@ -20,7 +20,7 @@ class expression {
 		success
 	};
 
-	enum class type_of_literal {
+	enum class type {
 		operand,
 		right_bracket,
 		left_bracket,
@@ -34,8 +34,8 @@ class expression {
 
 	std::string infix_str;
 	std::string postfix_str;
-	std::vector<std::pair<std::string, type_of_literal>> infix;
-	std::vector<std::pair<std::string, type_of_literal>> postfix;
+	std::vector<std::pair<std::string, type>> infix;
+	std::vector<std::pair<std::string, type>> postfix;
 
 	const std::vector<char> operations = { '+','-','*','/' };
 	const std::map<char, int> priorities = { {'+',0},{'-',0},{'*',1},{'/',1} };
