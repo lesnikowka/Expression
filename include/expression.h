@@ -15,7 +15,6 @@ class expression {
 		number,
 		number_or_left_bracket,
 		number_or_left_bracket_or_unary_minus,
-		number_or_operation_or_point_or_right_bracket,
 		number_or_operation_or_right_bracket,
 		operation_or_right_bracket,
 		success
@@ -37,8 +36,6 @@ class expression {
 
 	const std::vector<char> operations = { '+','-','*','/', '%'};
 	const std::map<char, int> priorities = { {'+',0},{'-',0},{'*',1},{'/',1},{'%',1}};
-	const std::vector<char> left_brackets = { '(','[','{' };
-	const std::vector<char> right_brackets = { ')',']','}' };
 	const std::vector<char> numbers = { '1','2', '3', '4', '5', '6', '7', '8', '9', '0' };
 	
 

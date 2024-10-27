@@ -121,11 +121,11 @@ bool expression::is_number(char value) {
 }
 
 bool expression::is_right_bracket(char value) {
-	return is_in_vector(right_brackets, value);
+	return value == ')';
 }
 
 bool expression::is_left_bracket(char value) {
-	return is_in_vector(left_brackets, value);
+	return value == '(';
 }
 
 bool expression::is_operation(char value) {
@@ -203,7 +203,7 @@ bool expression::split() {
 			unaryMinusIsPreviousLiteral = false;
 			if (is_number(symbol) || is_left_bracket(symbol) || symbol == '-') {
 				if (is_number(symbol)) {
-					state = waiting::number_or_operation_or_point_or_right_bracket;
+					state = waiting::number_or_operation_or_right_bracket;
 				}
 
 				else if (is_left_bracket(symbol)) {
@@ -229,7 +229,7 @@ bool expression::split() {
 		case waiting::number_or_left_bracket:
 			if (is_number(symbol) || is_left_bracket(symbol)) {
 				if (is_number(symbol)) {
-					state = waiting::number_or_operation_or_point_or_right_bracket;
+					state = waiting::number_or_operation_or_right_bracket;
 				}
 
 				else if (is_left_bracket(symbol)) {
@@ -274,46 +274,6 @@ bool expression::split() {
 
 					tmp_split.push_back({ infix_str.substr(start, i - start), type::operand });
 					tmp_split.push_back({ infix_str.substr(i,1), type::operation });
-
-					start = i + 1;
-				}
-
-				else if (is_number(symbol)) {
-					if (i == infix_str.size() - 1) {
-						state = waiting::success;
-					}
-				}
-
-				unaryMinusIsPreviousLiteral = false;
-			}
-			else {
-				return false;
-			}
-			break;
-
-		case waiting::number_or_operation_or_point_or_right_bracket:
-			if (symbol == '.' || is_right_bracket(symbol) || is_number(symbol) || is_operation(symbol)) {
-
-				if (symbol == '.') {
-					state = waiting::number;
-				}
-
-				else if (is_right_bracket(symbol)) {
-					state = waiting::operation_or_right_bracket;
-
-					if (i == infix_str.size() - 1) {
-						state = waiting::success;
-					}
-
-					tmp_split.push_back({ infix_str.substr(start, i - start), type::operand });
-					tmp_split.push_back({ infix_str.substr(i, 1), type::right_bracket });
-				}
-
-				else if (is_operation(symbol)) {
-					state = waiting::number_or_left_bracket;
-
-					tmp_split.push_back({ infix_str.substr(start, i - start), type::operand });
-					tmp_split.push_back({ infix_str.substr(i, 1), type::operation });
 
 					start = i + 1;
 				}
