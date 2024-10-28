@@ -8,14 +8,6 @@ expression::expression(std::string str) : infix_str(str) {
 	to_postfix();
 }
 
-expression::expression(std::string str, std::initializer_list<std::pair<std::string, double>> list) : expression(str) {
-	for (auto i : list) {
-		add_variable(i);
-		
-		variables.insert(i);
-	}
-}
-
 std::string expression::get_infix() { 
 	return infix_str; 
 }
@@ -24,24 +16,7 @@ std::string expression::get_postfix() {
 	return postfix_str; 
 }
 
-
-void expression::add_variable(std::pair<std::string, double> var){
-	if (!correct_name(var.first)) {
-		throw "incorrect name of variable";
-	}
-
-	else if (variables.find(var.first) != variables.end()) {
-		throw "variable was added earlier";
-	}
-
-	else {
-		variables.insert(var);
-	}
-}
-
 void expression::clear() {
-	variables = constants;
-
 	infix_str.clear();
 	postfix_str.clear();
 	infix.clear();
@@ -74,20 +49,7 @@ double expression::calculate() {
 		std::string literal = i.first;
 
 		if (i.second == type::operand) {
-			if (is_in_vector(symbols, i.first.back())) {
-				if (i.first.front() == '-') {
-					literal = literal.substr(1);
-				}
-
-				if (variables.find(literal) == variables.end()) {
-					throw "variable was not input";
-				}
-
-				values.push(variables[literal] * (1 - 2 * (int)(i.first.front() == '-')));
-			}
-			else {
-				values.push(std::stod(literal));
-			}
+			values.push(std::stod(literal));
 		}
 
 		else {
@@ -153,44 +115,16 @@ bool expression::is_number(char value) {
 	return is_in_vector(numbers, value);
 }
 
-bool expression::is_symbol(char value) {
-	return is_in_vector(symbols, value);
-}
-
 bool expression::is_right_bracket(char value) {
-	return is_in_vector(right_brackets, value);
+	return value == ')';
 }
 
 bool expression::is_left_bracket(char value) {
-	return is_in_vector(left_brackets, value);
+	return value == '(';
 }
 
 bool expression::is_operation(char value) {
 	return is_in_vector(operations, value);
-}
-
-void expression::request_variables() {
-	double value;
-
-	for (auto var : infix) {
-		if (is_in_vector(symbols, var.first.back())) {
-			if (var.first.front() == '-' && variables.find(var.first.substr(1)) == variables.end()) {
-				std::cout << var.first.substr(1) << " = ";
-				std::cin >> value;
-				std::cout << std::endl;
-
-				add_variable(std::make_pair(var.first.substr(1), -value));
-			}
-
-			else if (variables.find(var.first) == variables.end()) {
-				std::cout << var.first << " = ";
-				std::cin >> value;
-				std::cout << std::endl;
-
-				add_variable(std::make_pair(var.first, value));
-			}
-		}
-	}
 }
 
 std::istream& operator>>(std::istream& in, expression& ex) {
@@ -203,7 +137,6 @@ std::istream& operator>>(std::istream& in, expression& ex) {
 	}
 
 	ex.to_postfix();
-	ex.request_variables();
 
 	return in;
 }
@@ -218,16 +151,6 @@ void expression::change_expression(std::string ex) {
 	}
 
 	to_postfix();
-}
-
-bool expression::correct_name(std::string var) {
-	for (auto i : var) {
-		if (!is_in_vector(symbols, i)) {
-			return false;
-		}
-	}
-
-	return true;
 }
 
 bool expression::check_brackets() {
@@ -255,7 +178,7 @@ bool expression::check_brackets() {
 }
 
 bool expression::split() {
-	waiting state = waiting::number_or_left_bracket_or_unary_minus_or_symbol;
+	waiting state = waiting::number_or_left_bracket_or_unary_minus;
 
 	std::vector<std::pair<std::string, type>> tmp_split;
 
@@ -270,49 +193,10 @@ bool expression::split() {
 	for (size_t i = 0; i < infix_str.size(); i++) {
 		char symbol = infix_str[i];
 		switch (state) {
-
-		case waiting::symbol_or_operation_or_right_bracket:
-			if (is_symbol(symbol) || is_operation(symbol) || is_right_bracket(symbol)) {
-				if (is_symbol(symbol)) {
-					if (i == infix_str.size() - 1) {
-						state = waiting::success;
-					}
-				}
-
-				if (is_operation(symbol)) {
-					state = waiting::number_or_left_bracket_or_symbol;
-
-					tmp_split.push_back({ infix_str.substr(start, i - start), type::operand });
-					tmp_split.push_back({ infix_str.substr(i, 1), type::operation });
-
-					start = i + 1;
-				}
-
-				if (is_right_bracket(symbol)) {
-					state = waiting::operation_or_right_bracket;
-
-					tmp_split.push_back({ infix_str.substr(start, i - start), type::operand });
-					tmp_split.push_back({ infix_str.substr(i, 1), type::right_bracket });
-
-					if (i == infix_str.size() - 1) {
-						state = waiting::success;
-					}
-				}
-			}
-			else {
-				return false;
-			}
-			break;
-
-
-		case waiting::number_or_left_bracket_or_unary_minus_or_symbol:
+		case waiting::number_or_left_bracket_or_unary_minus:
 			unaryMinusIsPreviousLiteral = false;
-			if (is_in_vector(numbers, symbol) || is_left_bracket(symbol) || symbol == '-' || is_symbol(symbol)) {
-				if (is_symbol(symbol)) {
-					state = waiting::symbol_or_operation_or_right_bracket;
-				}
-
-				else if (is_in_vector(numbers, symbol)) {
+			if (is_in_vector(numbers, symbol) || is_left_bracket(symbol) || symbol == '-') {
+				if (is_in_vector(numbers, symbol)) {
 					state = waiting::number_or_operation_or_point_or_right_bracket;
 				}
 
@@ -322,7 +206,7 @@ bool expression::split() {
 				}
 
 				else if (symbol == '-') {
-					state = waiting::number_or_left_bracket_or_symbol;
+					state = waiting::number_or_left_bracket;
 					start = i;
 					unaryMinusIsPreviousLiteral = true;
 				}
@@ -336,18 +220,14 @@ bool expression::split() {
 			}
 			break;
 
-		case waiting::number_or_left_bracket_or_symbol:
-			if (is_in_vector(numbers, symbol) || is_left_bracket(symbol) || is_symbol(symbol)) {
-				if (is_symbol(symbol)) {
-					state = waiting::symbol_or_operation_or_right_bracket;
-				}
-
-				else if (is_in_vector(numbers, symbol)) {
+		case waiting::number_or_left_bracket:
+			if (is_in_vector(numbers, symbol) || is_left_bracket(symbol)) {
+				if (is_in_vector(numbers, symbol)) {
 					state = waiting::number_or_operation_or_point_or_right_bracket;
 				}
 
 				else if (is_left_bracket(symbol)) {
-					state = waiting::number_or_left_bracket_or_unary_minus_or_symbol;
+					state = waiting::number_or_left_bracket_or_unary_minus;
 
 					if (unaryMinusIsPreviousLiteral) {
 						tmp_split.push_back(std::make_pair("-1", type::operand));
@@ -384,7 +264,7 @@ bool expression::split() {
 				}
 
 				else if (is_operation(symbol)) {
-					state = waiting::number_or_left_bracket_or_symbol;
+					state = waiting::number_or_left_bracket;
 
 					tmp_split.push_back({ infix_str.substr(start, i - start), type::operand });
 					tmp_split.push_back({ infix_str.substr(i,1), type::operation });
@@ -424,7 +304,7 @@ bool expression::split() {
 				}
 
 				else if (is_operation(symbol)) {
-					state = waiting::number_or_left_bracket_or_symbol;
+					state = waiting::number_or_left_bracket;
 
 					tmp_split.push_back({ infix_str.substr(start, i - start), type::operand });
 					tmp_split.push_back({ infix_str.substr(i, 1), type::operation });
@@ -464,7 +344,7 @@ bool expression::split() {
 			if (is_right_bracket(symbol) || is_operation(symbol)) {
 
 				if (is_operation(symbol)) {
-					state = waiting::number_or_left_bracket_or_symbol;
+					state = waiting::number_or_left_bracket;
 
 					if (i == infix_str.size() - 1) {
 						return false;
@@ -496,7 +376,7 @@ bool expression::split() {
 
 
 	if (state == waiting::success) {
-		if (is_number(infix_str[infix_str.size() - 1]) || is_symbol(infix_str[infix_str.size() - 1])) {
+		if (is_number(infix_str[infix_str.size() - 1])) {
 			tmp_split.push_back({ infix_str.substr(start, infix_str.size() - start), type::operand });
 		}
 
