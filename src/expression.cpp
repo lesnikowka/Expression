@@ -2,7 +2,7 @@
 
 expression::expression(std::string str) : infix_str(str) {
 	if (!split()) {
-		throw "incorrect input";
+		throw std::invalid_argument("incorrect input");
 	}
 
 	to_postfix();
@@ -133,7 +133,7 @@ std::istream& operator>>(std::istream& in, expression& ex) {
 	in >> ex.infix_str;
 
 	if (!ex.split()) {
-		throw "incorrect input";
+		throw std::invalid_argument("incorrect input");
 	}
 
 	ex.to_postfix();
@@ -147,7 +147,7 @@ void expression::change_expression(std::string ex) {
 	infix_str = ex;
 
 	if (!split()) {
-		throw "incorrect input";
+		throw std::invalid_argument("incorrect input");
 	}
 
 	to_postfix();
@@ -155,13 +155,11 @@ void expression::change_expression(std::string ex) {
 
 bool expression::check_brackets() {
 	std::stack<char> st;
-	std::string left_brackets = "([{";
-	std::string right_brackets = ")]}";
 
 	for (char element : infix_str) {
-		if (left_brackets.find(element) != -1 || right_brackets.find(element) != -1) {
-			if (left_brackets.find(element) != -1) {
-				st.push(right_brackets[left_brackets.find(element)]);
+		if (is_left_bracket(element) || is_right_bracket(element)) {
+			if (is_left_bracket(element)) {
+				st.push(')');
 			}
 
 			else if (!st.empty() && st.top() == element) {
