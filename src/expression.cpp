@@ -33,7 +33,7 @@ double expression::operate(double first, double second, char operation) {
 		return first * second;
 	case '/':
 		if (second == 0) {
-			throw "division by zero";
+			throw std::invalid_argument("Division by zero");
 		}
 		return first / second;
 	}
@@ -195,8 +195,8 @@ bool expression::split() {
 		switch (state) {
 		case waiting::number_or_left_bracket_or_unary_minus:
 			unaryMinusIsPreviousLiteral = false;
-			if (is_in_vector(numbers, symbol) || is_left_bracket(symbol) || symbol == '-') {
-				if (is_in_vector(numbers, symbol)) {
+			if (is_number(symbol) || is_left_bracket(symbol) || symbol == '-') {
+				if (is_number(symbol)) {
 					state = waiting::number_or_operation_or_point_or_right_bracket;
 				}
 
@@ -221,8 +221,8 @@ bool expression::split() {
 			break;
 
 		case waiting::number_or_left_bracket:
-			if (is_in_vector(numbers, symbol) || is_left_bracket(symbol)) {
-				if (is_in_vector(numbers, symbol)) {
+			if (is_number(symbol) || is_left_bracket(symbol)) {
+				if (is_number(symbol)) {
 					state = waiting::number_or_operation_or_point_or_right_bracket;
 				}
 
@@ -250,7 +250,7 @@ bool expression::split() {
 			break;
 
 		case waiting::number_or_operation_or_right_bracket:
-			if (is_right_bracket(symbol) || is_in_vector(numbers, symbol) || is_operation(symbol)) {
+			if (is_right_bracket(symbol) || is_number(symbol) || is_operation(symbol)) {
 
 				if (is_right_bracket(symbol)) {
 					state = waiting::operation_or_right_bracket;
@@ -272,7 +272,7 @@ bool expression::split() {
 					start = i + 1;
 				}
 
-				else if (is_in_vector(numbers, symbol)) {
+				else if (is_number(symbol)) {
 					if (i == infix_str.size() - 1) {
 						state = waiting::success;
 					}
@@ -286,7 +286,7 @@ bool expression::split() {
 			break;
 
 		case waiting::number_or_operation_or_point_or_right_bracket:
-			if (symbol == '.' || is_right_bracket(symbol) || is_in_vector(numbers, symbol) || is_operation(symbol)) {
+			if (symbol == '.' || is_right_bracket(symbol) || is_number(symbol) || is_operation(symbol)) {
 
 				if (symbol == '.') {
 					state = waiting::number;
@@ -312,7 +312,7 @@ bool expression::split() {
 					start = i + 1;
 				}
 
-				else if (is_in_vector(numbers, symbol)) {
+				else if (is_number(symbol)) {
 					if (i == infix_str.size() - 1) {
 						state = waiting::success;
 					}
@@ -326,7 +326,7 @@ bool expression::split() {
 			break;
 
 		case waiting::number:
-			if (is_in_vector(numbers, symbol)) {
+			if (is_number(symbol)) {
 				state = waiting::number_or_operation_or_right_bracket;
 
 				if (i == infix_str.size() - 1) {
