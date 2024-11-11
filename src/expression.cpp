@@ -612,7 +612,7 @@ bool expression::split() {
 	}
 
 	if (state == waiting::success) {
-		if (is_number(infix_str[infix_str.size() - 1]) || is_symbol(infix_str[infix_str.size() - 1]) || is_right_bracket(infix_str[infix_str.size() - 1])) {
+		if (is_number(infix_str[infix_str.size() - 1]) || is_symbol(infix_str[infix_str.size() - 1]) || !lastVariableName.empty()) {
 			tmp_split.push_back({ operandName , type::operand });
 		}
 
