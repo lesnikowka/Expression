@@ -40,8 +40,6 @@ class expression {
 
 	const std::vector<char> operations = { '+','-','*','/', '%'};
 	const std::map<char, int> priorities = { {'+',0},{'-',0},{'*',1},{'/',1}, {'%', 1}};
-	const std::vector<char> left_brackets = { '(','[','{' };
-	const std::vector<char> right_brackets = { ')',']','}' };
 	const std::vector<char> numbers = { '1','2', '3', '4', '5', '6', '7', '8', '9', '0' };
 	const std::vector<char> symbols = { 'q', 'Q', 'w', 'W', 'e', 'E', 'r', 'R', 't', 'T', 'y', 'Y', 'u',
 		'U', 'i', 'I', 'o', 'O', 'p', 'P', 'a', 'A', 's', 'S', 'd', 'D', 'f', 'F', 'g', 'G', 'h', 'H',

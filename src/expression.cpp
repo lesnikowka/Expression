@@ -188,11 +188,11 @@ bool expression::is_symbol(char value) {
 }
 
 bool expression::is_right_bracket(char value) {
-	return is_in_vector(right_brackets, value);
+	return value == ')';
 }
 
 bool expression::is_left_bracket(char value) {
-	return is_in_vector(left_brackets, value);
+	return value == '(';
 }
 
 bool expression::is_operation(char value) {
@@ -262,13 +262,11 @@ bool expression::correct_name(std::string var) {
 
 bool expression::check_brackets() {
 	std::stack<char> st;
-	std::string left_brackets = "([{";
-	std::string right_brackets = ")]}";
 
 	for (char element : infix_str) {
-		if (left_brackets.find(element) != -1 || right_brackets.find(element) != -1) {
-			if (left_brackets.find(element) != -1) {
-				st.push(right_brackets[left_brackets.find(element)]);
+		if (is_left_bracket(element) || is_right_bracket(element)) {
+			if (is_left_bracket(element)) {
+				st.push(')');
 			}
 
 			else if (!st.empty() && st.top() == element) {
