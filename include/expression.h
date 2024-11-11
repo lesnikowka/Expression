@@ -23,7 +23,8 @@ class expression {
 	};
 
 	enum class type {
-		operand,
+		operand_int,
+		operand_double,
 		right_bracket,
 		left_bracket,
 		operation,
@@ -45,16 +46,15 @@ class expression {
 		'U', 'i', 'I', 'o', 'O', 'p', 'P', 'a', 'A', 's', 'S', 'd', 'D', 'f', 'F', 'g', 'G', 'h', 'H',
 		'j', 'J', 'k', 'K', 'l', 'L', 'z', 'Z', 'x', 'X', 'c', 'C', 'v', 'V', 'b', 'B', 'n', 'N', 'm', 'M', '_' };
 
-	
-	std::map<std::string, double> constants = { {"pi",3.14159265358979323846}, {"e", 2.71828182845904523536}};
-	std::map<std::string, double> variables = constants;
+	std::map<std::string, std::pair<double, type>> variables = {};
 	
 
 	void to_postfix();
 	void clear();
 	void request_variables();
 	
-	double operate(double first, double second, char operation);
+	std::pair<double, type> operate(std::pair<double, type> first, std::pair<double, type> second, char operation);
+	
 	
 	bool split();
 	bool check_brackets();

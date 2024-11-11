@@ -1,8 +1,27 @@
 #include "expression.h"
 
+template<class T>
+T operateT(T first, T second, char operation)
+{
+	switch (operation) {
+	case '+':
+		return first + second;
+	case '-':
+		return first - second;
+	case '*':
+		return first * second;
+	case '/':
+		if (second == 0) {
+			throw std::invalid_argument("division by zero");
+		}
+		return first / second;
+	}
+	return 0;
+}
+
 expression::expression(std::string str) : infix_str(str) {
 	if (!split()) {
-		throw "incorrect input";
+		throw std::invalid_argument( "incorrect input");
 	}
 
 	to_postfix();
@@ -27,11 +46,11 @@ std::string expression::get_postfix() {
 
 void expression::add_variable(std::pair<std::string, double> var){
 	if (!correct_name(var.first)) {
-		throw "incorrect name of variable";
+		throw std::invalid_argument( "incorrect name of variable");
 	}
 
 	else if (variables.find(var.first) != variables.end()) {
-		throw "variable was added earlier";
+		throw std::invalid_argument( "variable was added earlier");
 	}
 
 	else {
@@ -40,60 +59,57 @@ void expression::add_variable(std::pair<std::string, double> var){
 }
 
 void expression::clear() {
-	variables = constants;
-
 	infix_str.clear();
 	postfix_str.clear();
 	infix.clear();
 	postfix.clear();
 }
 
-double expression::operate(double first, double second, char operation) {
-	switch (operation) {
-	case '+':
-		return first + second;
-	case '-':
-		return first - second;
-	case '*':
-		return first * second;
-	case '/':
-		if (second == 0) {
-			throw "division by zero";
-		}
-		return first / second;
+std::pair<double, expression::type> expression::operate(std::pair<double, type> first, std::pair<double, type> second, char operation){
+	if ((first.second == type::operand_double || second.second == type::operand_double) && operation == '%') {
+		throw std::invalid_argument("Mod is not allowed for double");
 	}
-	return 0;
+
+	if (first.second == type::operand_int || second.second == type::operand_int) {
+		if (operation == '%')
+		{
+			return std::make_pair((double)((int)first.first % (int)second.first), type::operand_int);
+		}
+		return std::make_pair((double)operateT<int>(first.first, second.first, operation), type::operand_int);
+	}
+
+	return std::make_pair(operateT<double>(first.first, second.first, operation), type::operand_double);
 }
 
 double expression::calculate() {
-	std::stack<double> values;
-
-	double first_op, second_op;
+	std::stack<std::pair<double, type>> values;
 
 	for (auto i : postfix) {
 		std::string literal = i.first;
 
-		if (i.second == type::operand) {
+		if (i.second == type::operand_int || i.second == type::operand_double) {
 			if (is_in_vector(symbols, i.first.back())) {
 				if (i.first.front() == '-') {
 					literal = literal.substr(1);
 				}
 
 				if (variables.find(literal) == variables.end()) {
-					throw "variable was not input";
+					throw std::invalid_argument( "variable was not input");
 				}
 
-				values.push(variables[literal] * (1 - 2 * (int)(i.first.front() == '-')));
+				values.push({ variables[literal].first * (1 - 2 * (int)(i.first.front() == '-')),
+					variables[literal].second });
 			}
 			else {
-				values.push(std::stod(literal));
+				type literalType = literal.find(".") != -1 ? type::operand_double : type::operand_int;
+				values.push({ std::stod(literal), literalType });
 			}
 		}
 
 		else {
-			second_op = values.top();
+			auto second_op = values.top();
 			values.pop();
-			first_op = values.top();
+			auto first_op = values.top();
 			values.pop();
 
 			values.push(operate(first_op, second_op, i.first.front()));
@@ -199,7 +215,7 @@ std::istream& operator>>(std::istream& in, expression& ex) {
 	in >> ex.infix_str;
 
 	if (!ex.split()) {
-		throw "incorrect input";
+		throw std::invalid_argument( "incorrect input");
 	}
 
 	ex.to_postfix();
@@ -214,7 +230,7 @@ void expression::change_expression(std::string ex) {
 	infix_str = ex;
 
 	if (!split()) {
-		throw "incorrect input";
+		throw std::invalid_argument( "incorrect input");
 	}
 
 	to_postfix();
