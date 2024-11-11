@@ -57,7 +57,7 @@ class expression {
 	
 	bool split();
 	bool check_brackets();
-	bool correct_name(std::string var);
+	bool correct_name(const std::string& var);
 	bool is_in_vector(const std::vector<char>& v, char value);
 	bool is_number(char value);
 	bool is_symbol(char value);
@@ -67,15 +67,15 @@ class expression {
 
 public:
 	expression() = default;
-	expression(std::string str);
+	expression(const std::string& str);
 	expression(const expression& ex)=default;
-	expression(std::string str, std::initializer_list<std::pair<std::string, double>> list);
-	expression(std::string str, std::initializer_list<std::pair<std::string, int>> list);
+	expression(const std::string& str, std::initializer_list<std::pair<std::string, double>> list);
+	expression(const std::string& str, std::initializer_list<std::pair<std::string, int>> list);
 
 	void check_variable_name(const std::string& name);
 	void add_variable(std::pair<std::string, double> var);
 	void add_variable(std::pair<std::string, int> var);
-	void change_expression(std::string ex);
+	void change_expression(const std::string& ex);
 
 	double calculate();
 

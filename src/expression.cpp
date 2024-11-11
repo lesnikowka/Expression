@@ -19,7 +19,7 @@ T operateT(T first, T second, char operation)
 	return 0;
 }
 
-expression::expression(std::string str) : infix_str(str) {
+expression::expression(const std::string& str) : infix_str(str) {
 	if (!split()) {
 		throw std::invalid_argument( "incorrect input");
 	}
@@ -27,7 +27,7 @@ expression::expression(std::string str) : infix_str(str) {
 	to_postfix();
 }
 
-expression::expression(std::string str, std::initializer_list<std::pair<std::string, double>> list) : expression(str) {
+expression::expression(const std::string& str, std::initializer_list<std::pair<std::string, double>> list) : expression(str) {
 	for (auto i : list) {
 		add_variable(i);
 		
@@ -35,7 +35,7 @@ expression::expression(std::string str, std::initializer_list<std::pair<std::str
 	}
 }
 
-expression::expression(std::string str, std::initializer_list<std::pair<std::string, int>> list) {
+expression::expression(const std::string&, std::initializer_list<std::pair<std::string, int>> list) {
 	for (auto i : list) {
 		add_variable(i);
 
@@ -248,7 +248,7 @@ std::istream& operator>>(std::istream& in, expression& ex) {
 	return in;
 }
 
-void expression::change_expression(std::string ex) {
+void expression::change_expression(const std::string& ex) {
 	clear();
 
 	infix_str = ex;
@@ -260,7 +260,7 @@ void expression::change_expression(std::string ex) {
 	to_postfix();
 }
 
-bool expression::correct_name(std::string var) {
+bool expression::correct_name(const std::string& var) {
 	for (auto i : var) {
 		if (!is_in_vector(symbols, i)) {
 			return false;
