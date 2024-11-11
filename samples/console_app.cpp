@@ -4,9 +4,17 @@
 
 int main() {
 
-	expression ex;
-
-	std::cin >> ex;
-
-	std::cout << "Result: " << ex.calculate();
+	while (true)
+	{
+		try
+		{
+			expression ex;
+			std::cin >> ex;
+			std::cout << "Result: " << ex.calculate() << std::endl;
+		}
+		catch (const std::exception& ex)
+		{
+			std::cout << ex.what() << std::endl;
+		}
+	}
 }

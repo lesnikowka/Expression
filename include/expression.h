@@ -23,6 +23,7 @@ class expression {
 	};
 
 	enum class type {
+		operand,
 		operand_int,
 		operand_double,
 		right_bracket,
@@ -37,8 +38,8 @@ class expression {
 	std::vector<std::pair<std::string, type>> postfix;
 
 
-	const std::vector<char> operations = { '+','-','*','/' };
-	const std::map<char, int> priorities = { {'+',0},{'-',0},{'*',1},{'/',1} };
+	const std::vector<char> operations = { '+','-','*','/', '%'};
+	const std::map<char, int> priorities = { {'+',0},{'-',0},{'*',1},{'/',1}, {'%', 1}};
 	const std::vector<char> left_brackets = { '(','[','{' };
 	const std::vector<char> right_brackets = { ')',']','}' };
 	const std::vector<char> numbers = { '1','2', '3', '4', '5', '6', '7', '8', '9', '0' };
@@ -71,8 +72,11 @@ public:
 	expression(std::string str);
 	expression(const expression& ex)=default;
 	expression(std::string str, std::initializer_list<std::pair<std::string, double>> list);
+	expression(std::string str, std::initializer_list<std::pair<std::string, int>> list);
 
+	void check_variable_name(const std::string& name);
 	void add_variable(std::pair<std::string, double> var);
+	void add_variable(std::pair<std::string, int> var);
 	void change_expression(std::string ex);
 
 	double calculate();

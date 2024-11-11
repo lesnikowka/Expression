@@ -31,7 +31,15 @@ expression::expression(std::string str, std::initializer_list<std::pair<std::str
 	for (auto i : list) {
 		add_variable(i);
 		
-		variables.insert(i);
+		variables.insert({ i.first, {i.second, type::operand_double}});
+	}
+}
+
+expression::expression(std::string str, std::initializer_list<std::pair<std::string, int>> list) {
+	for (auto i : list) {
+		add_variable(i);
+
+		variables.insert({ i.first, {(double)i.second, type::operand_int} });
 	}
 }
 
@@ -43,19 +51,25 @@ std::string expression::get_postfix() {
 	return postfix_str; 
 }
 
+void expression::check_variable_name(const std::string& name)
+{
+	if (!correct_name(name)) {
+		throw std::invalid_argument("incorrect name of variable");
+	}
+
+	else if (variables.find(name) != variables.end()) {
+		throw std::invalid_argument("variable was added earlier");
+	}
+}
 
 void expression::add_variable(std::pair<std::string, double> var){
-	if (!correct_name(var.first)) {
-		throw std::invalid_argument( "incorrect name of variable");
-	}
+	check_variable_name(var.first);
+	variables.insert({ var.first, {var.second, type::operand_double} });
+}
 
-	else if (variables.find(var.first) != variables.end()) {
-		throw std::invalid_argument( "variable was added earlier");
-	}
-
-	else {
-		variables.insert(var);
-	}
+void expression::add_variable(std::pair<std::string, int> var) {
+	check_variable_name(var.first);
+	variables.insert({var.first, {(double)var.second, type::operand_int} });
 }
 
 void expression::clear() {
@@ -70,7 +84,7 @@ std::pair<double, expression::type> expression::operate(std::pair<double, type> 
 		throw std::invalid_argument("Mod is not allowed for double");
 	}
 
-	if (first.second == type::operand_int || second.second == type::operand_int) {
+	if (first.second == type::operand_int && second.second == type::operand_int) {
 		if (operation == '%')
 		{
 			return std::make_pair((double)((int)first.first % (int)second.first), type::operand_int);
@@ -87,7 +101,7 @@ double expression::calculate() {
 	for (auto i : postfix) {
 		std::string literal = i.first;
 
-		if (i.second == type::operand_int || i.second == type::operand_double) {
+		if (i.second == type::operand_int || i.second == type::operand_double || i.second == type::operand) {
 			if (is_in_vector(symbols, i.first.back())) {
 				if (i.first.front() == '-') {
 					literal = literal.substr(1);
@@ -116,7 +130,7 @@ double expression::calculate() {
 		}
 	}
 
-	return values.top();
+	return values.top().first;
 }
 
 void expression::to_postfix() {
