@@ -200,7 +200,7 @@ bool expression::is_operation(char value) {
 }
 
 void expression::request_variables() {
-	double value;
+	std::string value;
 
 	for (auto var : infix) {
 		if (is_in_vector(symbols, var.first.back())) {
@@ -209,7 +209,12 @@ void expression::request_variables() {
 				std::cin >> value;
 				std::cout << std::endl;
 
-				add_variable(std::make_pair(var.first.substr(1), -value));
+				if (value.find('.') != -1) {
+					add_variable(std::make_pair(var.first.substr(1), -std::stod(value)));
+				}
+				else {
+					add_variable(std::make_pair(var.first.substr(1), -std::stoi(value)));
+				}
 			}
 
 			else if (variables.find(var.first) == variables.end()) {
@@ -217,7 +222,12 @@ void expression::request_variables() {
 				std::cin >> value;
 				std::cout << std::endl;
 
-				add_variable(std::make_pair(var.first, value));
+				if (value.find('.') != -1) {
+					add_variable(std::make_pair(var.first, std::stod(value)));
+				}
+				else {
+					add_variable(std::make_pair(var.first, std::stoi(value)));
+				}
 			}
 		}
 	}
