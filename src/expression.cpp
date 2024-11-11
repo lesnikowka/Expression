@@ -30,7 +30,6 @@ expression::expression(const std::string& str) : infix_str(str) {
 expression::expression(const std::string& str, std::initializer_list<std::pair<std::string, double>> list) : expression(str) {
 	for (auto i : list) {
 		add_variable(i);
-		
 		variables.insert({ i.first, {i.second, type::operand_double}});
 	}
 }
@@ -95,6 +94,32 @@ std::pair<double, expression::type> expression::operate(std::pair<double, type> 
 	return std::make_pair(operateT<double>(first.first, second.first, operation), type::operand_double);
 }
 
+double expression::calculateFunc(const std::string& funcName, double val)
+{
+	if (funcName == "sin")
+	{
+		return sin(val);
+	}
+	else if (funcName == "cos")
+	{
+		return cos(val);
+	}
+	else if (funcName == "sqrt")
+	{
+		return sqrt(val);
+	}
+	else if (funcName == "lg")
+	{
+		return log(val);
+	}
+	else if (funcName == "exp")
+	{
+		return exp(val);
+	}
+
+	throw std::invalid_argument("incorrect func name");
+}
+
 double expression::calculate() {
 	std::stack<std::pair<double, type>> values;
 
@@ -102,7 +127,7 @@ double expression::calculate() {
 		std::string literal = i.first;
 
 		if (i.second == type::operand_int || i.second == type::operand_double || i.second == type::operand) {
-			if (is_in_vector(symbols, i.first.back())) {
+			if (is_in_vector(symbols, i.first.back()) || i.first[0] == '$') {
 				if (i.first.front() == '-') {
 					literal = literal.substr(1);
 				}
@@ -197,6 +222,25 @@ bool expression::is_left_bracket(char value) {
 
 bool expression::is_operation(char value) {
 	return is_in_vector(operations, value);
+}
+
+
+int expression::findBracket(const std::string& s, int start) {
+	int count = 1;
+
+	for (int i = start + 1; i < s.size(); i++) {
+		if (s[i] == '(') {
+			count++;
+		}
+		else if (s[i] == ')') {
+			count--;
+		}
+		if (count == 0) {
+			return i;
+		}
+	}
+
+	return -1;
 }
 
 void expression::request_variables() {
@@ -305,22 +349,32 @@ bool expression::split() {
 		return false;
 	}
 
+	std::string lastVariableName;
+
 	for (size_t i = 0; i < infix_str.size(); i++) {
 		char symbol = infix_str[i];
 		switch (state) {
-
 		case waiting::symbol_or_operation_or_right_bracket:
-			if (is_symbol(symbol) || is_operation(symbol) || is_right_bracket(symbol)) {
+			if (is_symbol(symbol) || is_operation(symbol) || is_right_bracket(symbol) || is_left_bracket(symbol)) {
 				if (is_symbol(symbol)) {
 					if (i == infix_str.size() - 1) {
 						state = waiting::success;
 					}
 				}
 
+				std::string variableName;
+				if (!lastVariableName.empty()) {
+					variableName = lastVariableName;
+					lastVariableName.clear();
+				}
+				else {
+					variableName = infix_str.substr(start, i - start);
+				}
+
 				if (is_operation(symbol)) {
 					state = waiting::number_or_left_bracket_or_symbol;
 
-					tmp_split.push_back({ infix_str.substr(start, i - start), type::operand });
+					tmp_split.push_back({ variableName, type::operand });
 					tmp_split.push_back({ infix_str.substr(i, 1), type::operation });
 
 					start = i + 1;
@@ -329,10 +383,27 @@ bool expression::split() {
 				if (is_right_bracket(symbol)) {
 					state = waiting::operation_or_right_bracket;
 
-					tmp_split.push_back({ infix_str.substr(start, i - start), type::operand });
+					tmp_split.push_back({ variableName, type::operand });
 					tmp_split.push_back({ infix_str.substr(i, 1), type::right_bracket });
 
 					if (i == infix_str.size() - 1) {
+						state = waiting::success;
+					}
+				}
+
+				if (is_left_bracket(symbol)) {
+					static int uniqueId = 0;
+					std::string functionName = infix_str.substr(start, i - start);
+					int position = findBracket(infix_str, i); 
+					expression ex(infix_str.substr(i + 1, position - i - 1));
+					double funcVal = calculateFunc(functionName, ex.calculate());
+					variables.insert({ "$" + std::to_string(uniqueId), {funcVal, type::operand_double}});
+					lastVariableName = "$" + std::to_string(uniqueId);
+					uniqueId++;
+					i = position;
+					start = position + 1;
+					if ((infix_str.size() - 1) == position)
+					{
 						state = waiting::success;
 					}
 				}
@@ -532,10 +603,17 @@ bool expression::split() {
 		}
 	}
 
+	std::string operandName;
+	if (!lastVariableName.empty()) {
+		operandName = lastVariableName;
+	}
+	else {
+		operandName = infix_str.substr(start, infix_str.size() - start);
+	}
 
 	if (state == waiting::success) {
-		if (is_number(infix_str[infix_str.size() - 1]) || is_symbol(infix_str[infix_str.size() - 1])) {
-			tmp_split.push_back({ infix_str.substr(start, infix_str.size() - start), type::operand });
+		if (is_number(infix_str[infix_str.size() - 1]) || is_symbol(infix_str[infix_str.size() - 1]) || is_right_bracket(infix_str[infix_str.size() - 1])) {
+			tmp_split.push_back({ operandName , type::operand });
 		}
 
 		infix = tmp_split;

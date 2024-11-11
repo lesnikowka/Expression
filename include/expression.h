@@ -53,8 +53,8 @@ class expression {
 	void request_variables();
 	
 	std::pair<double, type> operate(std::pair<double, type> first, std::pair<double, type> second, char operation);
-	
-	
+	double calculateFunc(const std::string& funcName, double val);
+
 	bool split();
 	bool check_brackets();
 	bool correct_name(const std::string& var);
@@ -64,6 +64,7 @@ class expression {
 	bool is_right_bracket(char value);
 	bool is_left_bracket(char value);
 	bool is_operation(char value);
+	int findBracket(const std::string& s, int start);
 
 public:
 	expression() = default;
